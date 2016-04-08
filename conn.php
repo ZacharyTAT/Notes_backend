@@ -28,10 +28,10 @@ class opmysql {
 	 * 链接数据库
 	 */
 	function init_conn() {
-		$this->conn = @mysql_connect ( $this->host, $this->name, $this->pwd );
-		@mysql_select_db ( $this->dBase, $this->conn );
-		error_reporting ( E_ALL & ~ E_DEPRECATED );
-		mysql_query ( "set names UTF8" );
+		$this->conn = @mysqli_connect ( $this->host, $this->name, $this->pwd );
+		@mysqli_select_db ($this->conn, $this->dBase);
+		//error_reporting ( E_ALL & ~ E_DEPRECATED );
+		mysqli_query ($this->conn, "set names UTF8" );
 	}
 	
 	/**
@@ -41,7 +41,7 @@ class opmysql {
 		if ($this->conn == '') {
 			$this->init_conn ();
 		}
-		$this->result = @mysql_query ( $sql, $this->conn );
+		$this->result = @mysqli_query ($this->conn, $sql);
 	}
 	
 	/**
@@ -49,8 +49,8 @@ class opmysql {
 	 */
 	function getRowsNum($sql) {
 		$this->mysql_query_rst ( $sql );
-		if (mysql_errno () == 0) {
-			return @mysql_num_rows ( $this->result );
+		if (mysqli_errno ($this->conn) == 0) {
+			return @mysqli_num_rows ( $this->result );
 		} else {
 			return '';
 		}
@@ -61,8 +61,8 @@ class opmysql {
 	 */
 	function getRowsRst($sql) {
 		$this->mysql_query_rst ( $sql );
-		if (mysql_error () == 0) {
-			$this->rowsRst = mysql_fetch_array ( $this->result, MYSQL_ASSOC );
+		if (mysqli_error ($this->conn) == 0) {
+			$this->rowsRst = mysqli_fetch_array ( $this->result, MYSQL_ASSOC );
 			return $this->rowsRst;
 		} else {
 			return '';
@@ -74,8 +74,8 @@ class opmysql {
 	 */
 	function getRowsArray($sql) {
 		$this->mysql_query_rst ( $sql );
-		if (mysql_errno () == 0) {
-			while ( $row = mysql_fetch_array ( $this->result, MYSQL_ASSOC ) ) {
+		if (mysqli_errno ($this->conn) == 0) {
+			while ( $row = mysqli_fetch_array ( $this->result, 1 ) ) {
 				$this->rowsArray [] = $row;
 			}
 			return $this->rowsArray;
@@ -91,9 +91,9 @@ class opmysql {
 		if ($this->conn == '') {
 			$this->init_conn ();
 		}
-		@mysql_query ( $sql );
-		$this->rowsNum = @mysql_affected_rows ();
-		if (mysql_errno () == 0) {
+		@mysqli_query ($this->conn, $sql );
+		$this->rowsNum = @mysqli_affected_rows ($this->conn);
+		if (mysqli_errno ($this->conn) == 0) {
 			return $this->rowsNum;
 		} else {
 			return '';
@@ -104,8 +104,8 @@ class opmysql {
 	 * 错误信息
 	 */
 	function msg_error() {
-		if (mysql_errno () != 0) {
-			$this->msg = mysql_error ();
+		if (mysqli_errno ($this->conn) != 0) {
+			$this->msg = mysqli_error ($this->conn);
 		}
 		return $this->msg;
 	}
@@ -114,7 +114,7 @@ class opmysql {
 	 * 释放结果集
 	 */
 	function close_rst() {
-		@mysql_free_result ( $this->result );
+		@mysqli_free_result ( $this->result );
 		$this->msg = '';
 		$this->rowsNum = 0;
 		$this->filesArray = '';
@@ -126,7 +126,7 @@ class opmysql {
 	 */
 	function close_conn() {
 		$this->close_rst ();
-		@mysql_close ( $this->conn );
+		@mysqli_close ( $this->conn );
 		$this->conn = '';
 	}
 }
