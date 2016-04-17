@@ -62,7 +62,7 @@ class opmysql {
 	function getRowsRst($sql) {
 		$this->mysql_query_rst ( $sql );
 		if (mysqli_error ($this->conn) == 0) {
-			$this->rowsRst = mysqli_fetch_array ( $this->result, MYSQL_ASSOC );
+			$this->rowsRst = mysqli_fetch_array ( $this->result, 1 );
 			return $this->rowsRst;
 		} else {
 			return '';

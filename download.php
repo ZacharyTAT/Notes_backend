@@ -1,16 +1,14 @@
 <?php
 require_once 'conn.php';
 
+
 header("content-type:text/json");
+
+	$uid = $_GET['uid'];
 	
-	$sql = "select * from note";
+	$sql = "select * from note where uid=$uid";
 	
 	$notes = $conn->getRowsArray($sql);
-	
-	if (empty($notes)) {
-		$sql = "select * from note_cache";
-		$notes = $conn->getRowsArray($sql);
-	}
 	
 	echo json_encode($notes);
 ?>

@@ -2,13 +2,22 @@
 
 	$json = $_POST['notes'];
 	
-	$never_download = $_POST['never_download'];
+	$uid = $_POST['uid'];
+	
+	//print_r($json);
+	//echo "--------<br/>";
+	//echo $uid;
 	
 	//var_dump(json_decode($notes));
 
+	if (empty($uid)) {
+		echo -1;
+		return;
+	}
+		
 	$notes = json_decode($json);
 	
-	//var_dump($notes);
+	//print_r($notes);
 	
 	$count = 0;
 	
@@ -21,32 +30,21 @@
 		$arr[$count]["stick"] = $note->stick;
 		$arr[$count]["lock"] = $note->lock;
 		$arr[$count]["datetime"] = $note->datetime;
-		$count += 1;
+		$count += 1;	
 	}
 	
-	echo save($arr, $never_download);
+	//echo "arr = ------<br/>";
 	
-	function save($notes, $never_download) {
+	//print_r($arr);
+	echo save($arr, $uid);
+
+	
+	function save($notes, $uid) {
 		
 		require_once 'conn.php';
 		
-		$count = 0;
-		
-		$emptyTable = "note_cache";
-		$table = "note";
-		
-		$res = $conn->getRowsNum("select * from $emptyTable");
-		
-		if ($res > 0) {
-			$emptyTable = "note";
-			$table = "note_cache";
-		}
-		
-		$targetTable = $emptyTable;
-		
-		if ($never_download == "1") {
-			$targetTable = $table;
-		}
+		//先删除所有该账号下的数据
+		$count = 0 - $conn->uidRst("delete from note where uid=$uid");
 		
 		//var_dump($notes);
 		//存入数据
@@ -59,15 +57,11 @@
 			$datetime = $note['datetime'];
 			
 			//存入数据库
-			$sql = "insert $targetTable values($id, '$title', '$content', $stick, $lock, $datetime)";
+			$sql = "insert note values($id, '$title', '$content', $stick, $lock, $datetime, $uid)";
 		
 			$count += $conn->uidRst($sql);
 		}
 		
-		//删除以前数据
-		if ($never_download == "0") {
-			$conn->uidRst("delete from $table");
-		}
 		return $count;
 	}
 ?>
