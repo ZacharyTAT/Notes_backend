@@ -44,10 +44,13 @@
 		require_once 'conn.php';
 		
 		//先删除所有该账号下的数据
-		$count = 0 - $conn->uidRst("delete from note where uid=$uid");
-		
+		$conn->uidRst("delete from note where uid=$uid");
+		//echo "after delete count=$count";
+		//echo "\n";
 		//var_dump($notes);
 		//存入数据
+		$count = 0;
+		
 		foreach ($notes as $note) {
 			$id = $note['id'];
 			$title = $note['title'];
